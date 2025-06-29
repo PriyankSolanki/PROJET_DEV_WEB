@@ -3,7 +3,7 @@
 
 <template>
     <footer>
-      <p>This work is protected by nothing | © 2025 | Priyank Solanki</p>
+      <p>This work is protected by nothing | © 2025</p>
     </footer>
 </template>
 

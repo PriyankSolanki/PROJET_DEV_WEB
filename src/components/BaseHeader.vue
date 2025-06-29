@@ -8,7 +8,7 @@ const store = useUserStore();
   <header>
     <div>
       <router-link to="/"><font-awesome-icon icon="home" /> Home</router-link>
-      <router-link v-if="store.user" to="/conversations">Conversations</router-link>
+      <router-link v-if="store.user" to="/mails">Mails</router-link>
     </div>
     <slot />
   </header>
@@ -16,7 +16,7 @@ const store = useUserStore();
 
 <style scoped>
 header{
-  background-color: #40ac73;
+  background-color: #25a4ed;
   display: flex;
   justify-content: space-between;
   margin: 0;

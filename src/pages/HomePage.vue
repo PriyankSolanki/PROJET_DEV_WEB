@@ -5,7 +5,7 @@ const userStore = useUserStore()
 
 <template>
   <div>
-    <h1> Welcome to my new project</h1>
+    <h1> Welcome to our new mailing project</h1>
     <h1 v-if="userStore.user">Welcome, {{ userStore.user.name }}</h1>
     <h1 v-else>Welcome, Guest</h1>
     <div class="buttons">

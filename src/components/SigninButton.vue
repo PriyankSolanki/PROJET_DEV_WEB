@@ -3,7 +3,7 @@
 </template>
 
 <script>
-//import { signInAndGetUser } from '@/lib/microsoftGraph';
+import { signInAndGetUser } from '@/lib/microsoftGraph';
 import { useUserStore } from '@/stores/userStore';
 import BaseButton from "@/components/BaseButton.vue";
 
@@ -13,7 +13,7 @@ export default {
     const userStore = useUserStore()
 
     const login = async () => {
-      const user = {name : 'priyank'}
+      const user = await signInAndGetUser();
       userStore.setUser(user)
     }
 
