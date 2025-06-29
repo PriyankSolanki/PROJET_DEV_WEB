@@ -1,10 +1,10 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomePage from '@/pages/HomePage.vue'
-import ConversationsIndexPage from '@/pages/ConversationsIndexPage.vue'
+import MailsIndexPage from '@/pages/MailsIndexPage.vue'
 
 const routes = [
     { path: '/', name: 'Home', component: HomePage },
-    { path: '/conversations', name: 'Conversations', component: ConversationsIndexPage}
+    { path: '/mails', name: 'Mails', component: MailsIndexPage}
 ]
 
 const router = createRouter({
