@@ -1,5 +1,12 @@
 <template>
-  <base-header><SigninButton @userChanged="handleUserChanged"></SigninButton></base-header>
+  <base-header>
+    <div v-if="user.user">
+      <LogoutButton @userChanged="handleUserRemoved"></LogoutButton>
+    </div>
+    <div v-else>
+      <SigninButton @userChanged="handleUserChanged"></SigninButton>
+    </div>
+  </base-header>
   <BaseLayout>
     <router-view />
   </BaseLayout>
@@ -12,6 +19,8 @@ import BaseFooter from "@/components/BaseFooter.vue";
 import BaseHeader from "@/components/BaseHeader.vue";
 import BaseLayout from "@/components/BaseLayout.vue";
 import SigninButton from "@/components/SigninButton.vue";
+import { useUserStore } from '@/stores/userStore';
+import LogoutButton from "@/components/LogoutButton.vue";
 
 export default {
   name: 'App',
@@ -20,16 +29,20 @@ export default {
     BaseLayout,
     BaseHeader,
     BaseFooter,
+    LogoutButton
   },
   data() {
     return {
       clickCount: 0,
-      user: null
+      user: useUserStore()
     }
   },
   methods: {
     handleUserChanged(newUser) {
       this.user = newUser;
+    },
+    handleUserRemoved(){
+      this.user = null;
     }
   }
 

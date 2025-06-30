@@ -7,6 +7,9 @@ export const useUserStore = defineStore('user', {
     actions: {
         setUser(newUser) {
             this.user = newUser
+        },
+        clearUser() {
+            this.user = null;
         }
     },
     persist: true

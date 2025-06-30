@@ -36,6 +36,13 @@ export async function signInAndGetUser () {
     };
 }
 
+export async function logout() {
+    await msalInstance.logoutPopup({
+        postLogoutRedirectUri: "/",
+    });
+}
+
+
 export async function getMails() {
     const account = msalInstance.getActiveAccount();
     if (!account) throw new Error("Aucun compte actif");
