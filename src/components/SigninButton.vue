@@ -13,11 +13,20 @@ export default {
     const userStore = useUserStore()
 
     const login = async () => {
-      const user = await signInAndGetUser();
-      userStore.setUser(user)
+      try{
+        const user = await signInAndGetUser();
+        userStore.setUser(user)
+      }catch(err){
+        console.error(err)
+      }
+
     }
 
     return { login }
   }
 }
 </script>
+
+<style scoped>
+</style>
+
