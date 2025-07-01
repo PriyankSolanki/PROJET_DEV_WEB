@@ -10,6 +10,7 @@ const store = useUserStore();
       <router-link to="/"><font-awesome-icon icon="home" /> Home</router-link>
       <router-link v-if="store.user" to="/mails">Mails</router-link>
     </div>
+    <div>MAILS MANAGER</div>
     <slot />
   </header>
 </template>

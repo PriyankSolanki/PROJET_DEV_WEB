@@ -1,15 +1,17 @@
 <script setup>
 import { useUserStore } from '@/stores/userStore'
+import BaseButton from "@/components/BaseButton.vue";
 const userStore = useUserStore()
 </script>
 
 <template>
   <div>
-    <h1> Welcome to our new mailing project</h1>
-    <h1 v-if="userStore.user">Welcome, {{ userStore.user.user.name }}</h1>
-    <h1 v-else>Welcome, Guest</h1>
+
+    <p v-if="userStore.user">Welcome <strong>{{ userStore.user.user.name }}</strong></p>
+    <p v-else>Welcome, Guest</p>
+    <p v-if="userStore.user">Mail <strong>{{userStore.user.user.username}}</strong></p>
     <div class="buttons">
-      <slot />
+      <router-link v-if="userStore.user" to="/mails"><BaseButton class="button-primary">Mails</BaseButton></router-link>
     </div>
   </div>
 </template>
