@@ -21,7 +21,7 @@ class Mail
     private ?string $sender = null;
 
     #[ORM\Column]
-    private array $recipents = [];
+    private array $recipients = [];
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $body = null;
@@ -65,14 +65,14 @@ class Mail
         return $this;
     }
 
-    public function getRecipents(): array
+    public function getRecipients(): array
     {
-        return $this->recipents;
+        return $this->recipients;
     }
 
-    public function setRecipents(array $recipents): static
+    public function setRecipients(array $recipients): static
     {
-        $this->recipents = $recipents;
+        $this->recipients = $recipients;
 
         return $this;
     }
