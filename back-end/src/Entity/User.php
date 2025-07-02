@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
@@ -21,6 +23,17 @@ class User
 
     #[ORM\Column(length: 255)]
     private ?string $microsoftId = null;
+
+    /**
+     * @var Collection<int, Mail>
+     */
+    #[ORM\OneToMany(targetEntity: Mail::class, mappedBy: 'user')]
+    private Collection $mails;
+
+    public function __construct()
+    {
+        $this->mails = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -59,6 +72,36 @@ class User
     public function setMicrosoftId(string $microsoftId): static
     {
         $this->microsoftId = $microsoftId;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Mail>
+     */
+    public function getMails(): Collection
+    {
+        return $this->mails;
+    }
+
+    public function addMail(Mail $mail): static
+    {
+        if (!$this->mails->contains($mail)) {
+            $this->mails->add($mail);
+            $mail->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMail(Mail $mail): static
+    {
+        if ($this->mails->removeElement($mail)) {
+            // set the owning side to null (unless already changed)
+            if ($mail->getUser() === $this) {
+                $mail->setUser(null);
+            }
+        }
 
         return $this;
     }
