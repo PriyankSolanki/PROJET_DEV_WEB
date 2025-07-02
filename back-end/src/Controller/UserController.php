@@ -15,9 +15,13 @@ use Symfony\Component\Routing\Annotation\Route;
 class UserController extends AbstractController
 {
 
-    #[Route('/{id}', methods: ['GET'])]
-    public function show(User $user): JsonResponse
+    #[Route('/{microsoftId}', methods: ['GET'])]
+    public function show(UserRepository $userRepository, string $microsoftId): JsonResponse
     {
+        $user = $userRepository->findOneBy(['microsoftId' => $microsoftId]);
+        if(!$user) {
+            return new JsonResponse(['message' => 'User not found'], Response::HTTP_NOT_FOUND);
+        }
         return $this->json([
             'id' => $user->getId(),
             'email' => $user->getEmail(),
@@ -50,9 +54,13 @@ class UserController extends AbstractController
         return $this->json(['id' => $user->getId()], Response::HTTP_CREATED);
     }
 
-    #[Route('/{id}', methods: ['DELETE'])]
-    public function delete(User $user, EntityManagerInterface $em): JsonResponse
+    #[Route('/{microsoftId}', methods: ['DELETE'])]
+    public function delete(EntityManagerInterface $em, string $microsoftId, UserRepository $userRepository): JsonResponse
     {
+        $user = $userRepository->findOneBy(['microsoftId' => $microsoftId]);
+        if(!$user) {
+            return new JsonResponse(['message' => 'User not found'], Response::HTTP_NOT_FOUND);
+        }
         $em->remove($user);
         $em->flush();
 

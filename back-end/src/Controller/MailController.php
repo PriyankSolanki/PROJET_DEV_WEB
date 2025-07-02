@@ -41,7 +41,7 @@ class MailController extends AbstractController
     }
 
     #[Route('/{messageId}', methods: ['GET'])]
-    public function show(Mail $mail, MailRepository $mailRepository, string $messageId): JsonResponse
+    public function show(MailRepository $mailRepository, string $messageId): JsonResponse
     {
         $mail = $mailRepository->findOneBy(['messageId' => $messageId]);
         if (!$mail) {
@@ -101,7 +101,7 @@ class MailController extends AbstractController
     }
 
     #[Route('/{messageId}', methods: ['DELETE'])]
-    public function delete(Mail $mail, EntityManagerInterface $em, MailRepository $mailRepository, string $messageId): JsonResponse
+    public function delete(EntityManagerInterface $em, MailRepository $mailRepository, string $messageId): JsonResponse
     {
         $mail = $mailRepository->findOneBy(['id' => $messageId]);
         if (!$mail) {
