@@ -10,6 +10,8 @@ front-end/.env
 back-end/.env.local
 back-end/.env.local.php
 back-end/.env.*.local
+back-end/.env
+back-end/.env.dev
 
 back-end/config/secrets/prod/prod.decrypt.private.php
 back-end/public/bundles/
