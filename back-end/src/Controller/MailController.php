@@ -12,11 +12,47 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use OpenApi\Attributes as OA;
 
 #[Route('/api/mails', name: 'api_mails_')]
 class MailController extends AbstractController
 {
-    #[Route('{microsoftId}', methods: ['GET'])]
+
+    #[OA\Get(
+        path: '/api/mails/{microsoftId}',
+        summary: 'Récupère tous les mails d’un utilisateur par Microsoft ID',
+        parameters: [
+            new OA\Parameter(
+                name: 'microsoftId',
+                description: 'Identifiant Microsoft unique de l’utilisateur',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'string')
+            )
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Liste des mails',
+                content: new OA\JsonContent(
+                    type: 'array',
+                    items: new OA\Items(
+                        properties: [
+                            new OA\Property(property: 'id', type: 'integer'),
+                            new OA\Property(property: 'subject', type: 'string'),
+                            new OA\Property(property: 'sender', type: 'string'),
+                            new OA\Property(property: 'recipients', type: 'array', items: new OA\Items(type: 'string')),
+                            new OA\Property(property: 'body', type: 'string'),
+                            new OA\Property(property: 'receivedAt', type: 'string', format: 'date-time')
+                        ],
+                        type: 'object'
+                    )
+                )
+            ),
+            new OA\Response(response: 404, description: 'Utilisateur non trouvé')
+        ]
+    )]
+    #[Route('/{microsoftId}', methods: ['GET'])]
     public function index(MailRepository $mailRepository, UserRepository $userRepository, string $microsoftId): JsonResponse
     {
 
@@ -40,6 +76,42 @@ class MailController extends AbstractController
         return $this->json($data);
     }
 
+
+    #[OA\Get(
+        path: '/api/mails/{messageId}',
+        summary: 'Récupère un mail à partir de son messageId',
+        parameters: [
+            new OA\Parameter(
+                name: 'messageId',
+                description: 'Identifiant unique du message (Microsoft Graph)',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'string')
+            )
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Mail trouvé',
+                content: new OA\JsonContent(
+                    type: 'object',
+                    properties: [
+                        new OA\Property(property: 'id', type: 'integer'),
+                        new OA\Property(property: 'subject', type: 'string'),
+                        new OA\Property(property: 'sender', type: 'string'),
+                        new OA\Property(property: 'recipients', type: 'array', items: new OA\Items(type: 'string')),
+                        new OA\Property(property: 'body', type: 'string'),
+                        new OA\Property(property: 'receivedAt', type: 'string', format: 'date-time'),
+                        new OA\Property(property: 'user', type: 'integer')
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 400,
+                description: 'Mail non trouvé'
+            )
+        ]
+    )]
     #[Route('/{messageId}', methods: ['GET'])]
     public function show(MailRepository $mailRepository, string $messageId): JsonResponse
     {
@@ -58,6 +130,48 @@ class MailController extends AbstractController
         ]);
     }
 
+
+    #[OA\Post(
+        path: '/api/mails',
+        summary: 'Créer un nouveau mail lié à un utilisateur Microsoft',
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                type: 'object',
+                required: ['sender', 'recipients', 'receivedAt', 'messageId', 'user'],
+                properties: [
+                    new OA\Property(property: 'subject', type: 'string', example: 'Re: Projet X'),
+                    new OA\Property(property: 'sender', type: 'string', example: 'alice@example.com'),
+                    new OA\Property(property: 'recipients', type: 'array', items: new OA\Items(type: 'string'), example: ['bob@example.com']),
+                    new OA\Property(property: 'body', type: 'string', example: 'Voici le contenu du mail...'),
+                    new OA\Property(property: 'receivedAt', type: 'string', format: 'date-time', example: '2025-07-02T12:34:56'),
+                    new OA\Property(property: 'messageId', type: 'string', example: 'abc-123456'),
+                    new OA\Property(
+                        property: 'user',
+                        type: 'object',
+                        required: ['microsoftId'],
+                        properties: [
+                            new OA\Property(property: 'microsoftId', type: 'string', example: 'user-1234')
+                        ]
+                    )
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 201,
+                description: 'Mail créé avec succès',
+                content: new OA\JsonContent(
+                    type: 'object',
+                    properties: [
+                        new OA\Property(property: 'id', type: 'integer', example: 42)
+                    ]
+                )
+            ),
+            new OA\Response(response: 400, description: 'Erreur dans les données envoyées'),
+            new OA\Response(response: 404, description: 'Utilisateur non trouvé')
+        ]
+    )]
     #[Route('', methods: ['POST'])]
     public function create(
         Request $request,
@@ -100,6 +214,29 @@ class MailController extends AbstractController
         return $this->json(['id' => $mail->getId()], Response::HTTP_CREATED);
     }
 
+    #[OA\Delete(
+        path: '/api/mails/{messageId}',
+        summary: 'Supprimer un mail par son identifiant interne (ID)',
+        parameters: [
+            new OA\Parameter(
+                name: 'messageId',
+                in: 'path',
+                required: true,
+                description: 'Identifiant du mail à supprimer (champ `id` en base)',
+                schema: new OA\Schema(type: 'string')
+            )
+        ],
+        responses: [
+            new OA\Response(
+                response: 204,
+                description: 'Mail supprimé avec succès (aucun contenu)'
+            ),
+            new OA\Response(
+                response: 404,
+                description: 'Mail non trouvé'
+            )
+        ]
+    )]
     #[Route('/{messageId}', methods: ['DELETE'])]
     public function delete(EntityManagerInterface $em, MailRepository $mailRepository, string $messageId): JsonResponse
     {
@@ -113,7 +250,50 @@ class MailController extends AbstractController
         return $this->json(null, Response::HTTP_NO_CONTENT);
     }
 
-    #[Route('/message/{messageId}', name: 'update_by_message_id', methods: ['PUT', 'PATCH'])]
+
+
+    #[OA\Patch(
+        path: '/api/mails/message/{messageId}',
+        summary: 'Met à jour un mail à partir de son messageId (Microsoft)',
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                type: 'object',
+                properties: [
+                    new OA\Property(property: 'subject', type: 'string', example: 'Nouveau sujet'),
+                    new OA\Property(property: 'body', type: 'string', example: 'Contenu mis à jour'),
+                    new OA\Property(property: 'recipients', type: 'array', items: new OA\Items(type: 'string')),
+                    new OA\Property(property: 'receivedAt', type: 'string', format: 'date-time', example: '2025-07-02T14:00:00')
+                ]
+            )
+        ),
+        parameters: [
+            new OA\Parameter(
+                name: 'messageId',
+                in: 'path',
+                required: true,
+                description: 'Identifiant Microsoft du mail à mettre à jour',
+                schema: new OA\Schema(type: 'string')
+            )
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Mail mis à jour avec succès',
+                content: new OA\JsonContent(
+                    type: 'object',
+                    properties: [
+                        new OA\Property(property: 'message', type: 'string', example: 'Mail updated'),
+                        new OA\Property(property: 'messageId', type: 'string', example: 'abcd1234')
+                    ]
+                )
+            ),
+            new OA\Response(response: 404, description: 'Mail non trouvé'),
+            new OA\Response(response: 400, description: 'Format invalide')
+        ]
+    )]
+
+    #[Route('/message/{messageId}', name: 'update_by_message_id', methods: ['PATCH'])]
     public function updateMailByMessageId(
         string $messageId,
         Request $request,
