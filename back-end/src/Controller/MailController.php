@@ -103,7 +103,7 @@ class MailController extends AbstractController
     #[Route('/{messageId}', methods: ['DELETE'])]
     public function delete(EntityManagerInterface $em, MailRepository $mailRepository, string $messageId): JsonResponse
     {
-        $mail = $mailRepository->findOneBy(['id' => $messageId]);
+        $mail = $mailRepository->findOneBy(['messageId' => $messageId]);
         if (!$mail) {
             return $this->json(['error' => 'Mail not found'], Response::HTTP_NOT_FOUND);
         }
