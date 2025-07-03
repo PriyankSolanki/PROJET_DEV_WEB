@@ -8,15 +8,15 @@ import { useUserStore } from '@/stores/userStore';
 import BaseButton from "@/components/BaseButton.vue";
 
 export default {
-  components: {BaseButton},
+  components: { BaseButton },
   setup() {
     const userStore = useUserStore()
 
     const login = async () => {
-      try{
+      try {
         const user = await signInAndGetUser();
         userStore.setUser(user)
-      }catch(err){
+      } catch (err) {
         console.error(err)
       }
 
@@ -27,6 +27,4 @@ export default {
 }
 </script>
 
-<style scoped>
-</style>
-
+<style scoped></style>

@@ -36,12 +36,6 @@ class Mail
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
-    #[ORM\Column]
-    private ?bool $send = null;
-
-    #[ORM\Column]
-    private ?bool $visible = null;
-
     public function getId(): ?int
     {
         return $this->id;
@@ -127,30 +121,6 @@ class Mail
     public function setUser(?User $user): static
     {
         $this->user = $user;
-
-        return $this;
-    }
-
-    public function isSend(): ?bool
-    {
-        return $this->send;
-    }
-
-    public function setSend(bool $send): static
-    {
-        $this->send = $send;
-
-        return $this;
-    }
-
-    public function isVisible(): ?bool
-    {
-        return $this->visible;
-    }
-
-    public function setVisible(bool $visible): static
-    {
-        $this->visible = $visible;
 
         return $this;
     }

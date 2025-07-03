@@ -41,7 +41,7 @@ export default {
     handleUserChanged(newUser) {
       this.user = newUser;
     },
-    handleUserRemoved(){
+    handleUserRemoved() {
       this.user = null;
     }
   }
