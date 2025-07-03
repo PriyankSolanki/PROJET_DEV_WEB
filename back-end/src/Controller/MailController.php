@@ -62,7 +62,7 @@ class MailController extends AbstractController
         if (!$user) {
             return $this->json(['error' => 'User not found'], Response::HTTP_NOT_FOUND);
         }
-        $mails = $mailRepository->findBy(['user' => $user]);
+        $mails = $mailRepository->findBy(['user' => $user, 'visible' => true]);
 
         $data = array_map(function (Mail $mail) {
             return [
