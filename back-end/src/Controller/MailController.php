@@ -118,7 +118,7 @@ class MailController extends AbstractController
             )
         ]
     )]
-    #[Route('/{messageId}', methods: ['GET'])]
+    #[Route('/message/{messageId}', methods: ['GET'])]
     public function show(MailRepository $mailRepository, string $messageId): JsonResponse
     {
         $mail = $mailRepository->findOneBy(['messageId' => $messageId]);
