@@ -82,7 +82,7 @@ class MailController extends AbstractController
 
 
     #[OA\Get(
-        path: '/api/mails/{messageId}',
+        path: '/api/mails/message/{messageId}',
         summary: 'Récupère un mail à partir de son messageId',
         parameters: [
             new OA\Parameter(
