@@ -43,7 +43,9 @@ class MailController extends AbstractController
                             new OA\Property(property: 'sender', type: 'string'),
                             new OA\Property(property: 'recipients', type: 'array', items: new OA\Items(type: 'string')),
                             new OA\Property(property: 'body', type: 'string'),
-                            new OA\Property(property: 'receivedAt', type: 'string', format: 'date-time')
+                            new OA\Property(property: 'receivedAt', type: 'string', format: 'date-time'),
+                            new OA\Property(property: 'send', type: 'boolean'),
+                            new OA\Property(property: 'visible', type: 'boolean'),
                         ],
                         type: 'object'
                     )
@@ -69,7 +71,9 @@ class MailController extends AbstractController
                 'sender' => $mail->getSender(),
                 'recipients' => $mail->getRecipients(),
                 'body' => $mail->getBody(),
-                'receivedAt' => $mail->getReceivedAt()->format('Y-m-d H:i:s')
+                'receivedAt' => $mail->getReceivedAt()->format('Y-m-d H:i:s'),
+                'send' => $mail->isSend(),
+                'visible' => $mail->isVisible(),
             ];
         }, $mails);
 
@@ -102,6 +106,8 @@ class MailController extends AbstractController
                         new OA\Property(property: 'recipients', type: 'array', items: new OA\Items(type: 'string')),
                         new OA\Property(property: 'body', type: 'string'),
                         new OA\Property(property: 'receivedAt', type: 'string', format: 'date-time'),
+                        new OA\Property(property: 'send', type: 'boolean'),
+                        new OA\Property(property: 'visible', type: 'boolean'),
                         new OA\Property(property: 'user', type: 'integer')
                     ]
                 )
@@ -126,6 +132,8 @@ class MailController extends AbstractController
             'recipients' => $mail->getRecipients(),
             'body' => $mail->getBody(),
             'receivedAt' => $mail->getReceivedAt()?->format('Y-m-d H:i:s'),
+            'send' => $mail->isSend(),
+            'visible' => $mail->isVisible(),
             'user' => $mail->getUser()?->getId(),
         ]);
     }
@@ -146,6 +154,7 @@ class MailController extends AbstractController
                     new OA\Property(property: 'body', type: 'string', example: 'Voici le contenu du mail...'),
                     new OA\Property(property: 'receivedAt', type: 'string', format: 'date-time', example: '2025-07-02T12:34:56'),
                     new OA\Property(property: 'messageId', type: 'string', example: 'abc-123456'),
+                    new OA\Property(property: 'send', type: 'boolean', example: '1'),
                     new OA\Property(
                         property: 'user',
                         type: 'object',
@@ -194,6 +203,9 @@ class MailController extends AbstractController
         if (!$data['messageId']) {
             return $this->json(['error' => 'missing [\'messageId\'] '], Response::HTTP_BAD_REQUEST);
         }
+        if (!$data['send']) {
+            return $this->json(['error' => 'missing [\'messageId\'] '], Response::HTTP_BAD_REQUEST);
+        }
         $user = $userRepo->findOneBy(['microsoftId' => $data['user']['microsoftId']]);
         if (!$user) {
             return $this->json(['error' => 'User not found'], Response::HTTP_NOT_FOUND);
@@ -206,6 +218,8 @@ class MailController extends AbstractController
         $mail->setBody($data['body'] ?? 'Aucun contenu');
         $mail->setReceivedAt(new DateTime($data['receivedAt'] ?? 'now'));
         $mail->setMessageId($data['messageId'] ?? uniqid());
+        $mail->setSend($data['send'] ?? 1);
+        $mail->setVisible(true);
         $mail->setUser($user);
 
         $em->persist($mail);
@@ -216,7 +230,7 @@ class MailController extends AbstractController
 
     #[OA\Delete(
         path: '/api/mails/{messageId}',
-        summary: 'Supprimer un mail par son identifiant interne (ID)',
+        summary: 'Supprimer un mail par son identifiant interne (ID) (le met en invisible)',
         parameters: [
             new OA\Parameter(
                 name: 'messageId',
@@ -244,7 +258,8 @@ class MailController extends AbstractController
         if (!$mail) {
             return $this->json(['error' => 'Mail not found'], Response::HTTP_NOT_FOUND);
         }
-        $em->remove($mail);
+        $mail->setVisible(false);
+        $em->persist($mail);
         $em->flush();
 
         return $this->json(null, Response::HTTP_NO_CONTENT);
