@@ -5,7 +5,7 @@ Ce projet universitaire est une application web permettant de consulter ses mail
 ### 👤 Équipe
 - SOLANKI Priyank
 - FARIA Lucas
-- LUAN Nam
+- GUERIN Nam
 - SYLLA El Hadj
 
 ## 📁 Structure
